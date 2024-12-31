@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Tâches</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Liste de Tâches</h1>
+
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Ajouter une nouvelle tâche">
+            <button id="addTaskButton">Ajouter</button>
+        </div>
+
+        <div class="task-list">
+            <ul id="taskList"></ul>
+        </div>
+
+        <div class="footer">
+            <button id="clearAllButton">Tout Supprimer</button>
+            <div id="taskCount">Total: 0 | Terminé: 0</div>
+        </div>
+    </div>
+
+    <script src="Devoir.js"></script>
+
+    <script>
+
+const taskInput = document.getElementById('taskInput');
+const addTaskButton = document.getElementById('addTaskButton');
+const taskList = document.getElementById('taskList');
+const clearAllButton = document.getElementById('clearAllButton');
+const taskCount = document.getElementById('taskCount');
+
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+function updateTaskList() {
+    taskList.innerHTML = '';
+    let completedCount = 0;
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task.name;
+        if (task.completed) {
+            li.classList.add('completed');
+            completedCount++;
+        }
+
+        li.addEventListener('click', () => {
+            task.completed = !task.completed;
+            saveTasks();
+            updateTaskList();
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Supprimer';
+        deleteButton.classList.add('delete-button');
+        deleteButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tasks.splice(index, 1);
+            saveTasks();
+            updateTaskList();
+        });
+
+        li.appendChild(deleteButton);
+        taskList.appendChild(li);
+    });
+
+    taskCount.textContent = `Total: ${tasks.length} | Terminé: ${completedCount}`;
+}
+
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+addTaskButton.addEventListener('click', () => {
+    const taskName = taskInput.value.trim();
+    if (taskName) {
+        tasks.push({ name: taskName, completed: false });
+        saveTasks();
+        taskInput.value = ''; 
+        updateTaskList();
+    }
+});
+
+clearAllButton.addEventListener('click', () => {
+    tasks = [];
+    saveTasks();
+    updateTaskList();
+});
+
+updateTaskList();
+
+        
+    </script>
+</body>
+</html>
+²
